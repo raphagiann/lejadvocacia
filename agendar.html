@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agendar Consulta — L&J Advocacia</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    .agendar-page {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 6rem 6% 4rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .agendar-page .glow-1 { width: 400px; height: 400px; background: rgba(200,169,126,.12); top: -80px; left: -80px; }
+    .agendar-page .glow-2 { width: 350px; height: 350px; background: rgba(232,213,183,.08); bottom: -60px; right: 5%; }
+
+    .agendar-box {
+      background: #1a1a1a;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 28px;
+      padding: 3rem;
+      width: 100%;
+      max-width: 640px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .agendar-box .section-label { margin-bottom: .6rem; }
+    .agendar-box h1 {
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: .5rem;
+    }
+    .agendar-box > p {
+      color: #8892a4;
+      font-size: .9rem;
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: .4rem;
+      margin-bottom: 1.1rem;
+    }
+    .form-group label {
+      font-size: .82rem;
+      font-weight: 600;
+      color: #e2e8f0;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: #111111;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: .85rem 1.1rem;
+      color: #e2e8f0;
+      font-family: 'Inter', sans-serif;
+      font-size: .9rem;
+      outline: none;
+      transition: border-color .2s;
+      width: 100%;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: #c8a97e; }
+    .form-group select option { background: #1a1a1a; }
+    .form-group textarea { resize: vertical; }
+
+    .form-row { display: flex; gap: 1rem; }
+    .form-row .form-group { flex: 1; }
+
+    .advogado-options {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .advogado-option {
+      flex: 1;
+      min-width: 120px;
+      background: #111111;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+    .advogado-option input[type="radio"] { display: none; }
+    .advogado-option:has(input:checked) {
+      border-color: #c8a97e;
+      background: rgba(200,169,126,.1);
+    }
+    .advogado-option .av { font-size: 1.8rem; margin-bottom: .4rem; }
+    .advogado-option strong { display: block; color: #fff; font-size: .9rem; }
+    .advogado-option span { color: #8892a4; font-size: .75rem; }
+
+    .modalidade-options {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .modalidade-option {
+      flex: 1;
+      min-width: 100px;
+      background: #111111;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 12px;
+      padding: .8rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      font-size: .85rem;
+      color: #8892a4;
+      font-weight: 500;
+    }
+    .modalidade-option input[type="radio"] { display: none; }
+    .modalidade-option:has(input:checked) {
+      border-color: #c8a97e;
+      background: rgba(200,169,126,.1);
+      color: #e8d5b7;
+    }
+
+    .submit-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1.5rem;
+    }
+    .submit-row a {
+      color: #8892a4;
+      font-size: .85rem;
+      text-decoration: none;
+      transition: color .2s;
+    }
+    .submit-row a:hover { color: #e8d5b7; }
+    .submit-row .btn-primary { padding: .85rem 2.5rem; }
+
+    .success-msg {
+      display: none;
+      text-align: center;
+      padding: 2rem 0;
+    }
+    .success-msg .check { font-size: 3rem; margin-bottom: 1rem; }
+    .success-msg h2 { color: #fff; font-size: 1.4rem; margin-bottom: .5rem; }
+    .success-msg p { color: #8892a4; font-size: .9rem; margin-bottom: 1.5rem; }
+
+    @media (max-width: 600px) {
+      .agendar-box { padding: 2rem 1.5rem; }
+      .form-row { flex-direction: column; gap: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <div class="logo">L&J <span>Advocacia</span></div>
+    <ul>
+      <li><a href="index.html#sobre">Sobre</a></li>
+      <li><a href="index.html#areas">Áreas</a></li>
+      <li><a href="index.html#advogados">Advogados</a></li>
+      <li><a href="index.html#contato">Contato</a></li>
+    </ul>
+    <a href="agendar.html" class="btn-nav">Consulta Gratuita</a>
+  </nav>
+
+  <div class="agendar-page">
+    <div class="hero-bg-glow glow-1"></div>
+    <div class="hero-bg-glow glow-2"></div>
+
+    <div class="agendar-box">
+      <div class="section-label">📅 Agendamento</div>
+      <h1>Agende sua <span class="gradient-text">Consulta Gratuita</span></h1>
+      <p>Preencha o formulário abaixo e entraremos em contato para confirmar seu horário.</p>
+
+      <form id="agendamento-form">
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Nome completo *</label>
+            <input type="text" placeholder="Seu nome" required />
+          </div>
+          <div class="form-group">
+            <label>Telefone / WhatsApp *</label>
+            <input type="tel" placeholder="(00) 90000-0000" required />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>E-mail *</label>
+          <input type="email" placeholder="seu@email.com" required />
+        </div>
+
+        <div class="form-group">
+          <label>Área jurídica de interesse *</label>
+          <select required>
+            <option value="" disabled selected>Selecione a área</option>
+            <option>Direito Civil</option>
+            <option>Direito Empresarial</option>
+            <option>Direito Trabalhista</option>
+            <option>Direito Imobiliário</option>
+            <option>Direito de Família</option>
+            <option>Direito do Consumidor</option>
+            <option>Outro</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Advogado de preferência</label>
+          <div class="advogado-options">
+            <label class="advogado-option">
+              <input type="radio" name="advogado" value="luiz" />
+              <div class="av">👨‍⚖️</div>
+              <strong>Luiz</strong>
+              <span>Civil · Empresarial</span>
+            </label>
+            <label class="advogado-option">
+              <input type="radio" name="advogado" value="julia" />
+              <div class="av">👩‍⚖️</div>
+              <strong>Julia</strong>
+              <span>Família · Trabalhista</span>
+            </label>
+            <label class="advogado-option">
+              <input type="radio" name="advogado" value="qualquer" checked />
+              <div class="av">⚖️</div>
+              <strong>Sem preferência</strong>
+              <span>Disponível</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Data desejada *</label>
+            <input type="date" required />
+          </div>
+          <div class="form-group">
+            <label>Horário preferido *</label>
+            <select required>
+              <option value="" disabled selected>Selecione</option>
+              <option>08:00</option>
+              <option>09:00</option>
+              <option>10:00</option>
+              <option>11:00</option>
+              <option>14:00</option>
+              <option>15:00</option>
+              <option>16:00</option>
+              <option>17:00</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Modalidade da consulta</label>
+          <div class="modalidade-options">
+            <label class="modalidade-option">
+              <input type="radio" name="modalidade" value="presencial" checked />
+              🏛️ Presencial
+            </label>
+            <label class="modalidade-option">
+              <input type="radio" name="modalidade" value="online" />
+              💻 Online (Videochamada)
+            </label>
+            <label class="modalidade-option">
+              <input type="radio" name="modalidade" value="telefone" />
+              📞 Telefone
+            </label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Descreva brevemente seu caso</label>
+          <textarea rows="3" placeholder="Conte um pouco sobre sua situação para que possamos nos preparar melhor..."></textarea>
+        </div>
+
+        <div class="submit-row">
+          <a href="index.html">← Voltar ao site</a>
+          <button type="submit" class="btn-primary">Confirmar Agendamento</button>
+        </div>
+
+      </form>
+
+      <div class="success-msg" id="success">
+        <div class="check">✅</div>
+        <h2>Agendamento solicitado!</h2>
+        <p>Recebemos sua solicitação. Entraremos em contato em até 24h para confirmar seu horário.</p>
+        <a href="index.html" class="btn-primary">Voltar ao site</a>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('agendamento-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      this.style.display = 'none';
+      document.getElementById('success').style.display = 'block';
+    });
+
+    const today = new Date().toISOString().split('T')[0];
+    document.querySelector('input[type="date"]').setAttribute('min', today);
+  </script>
+
+</body>
+</html>
